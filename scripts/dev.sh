@@ -23,6 +23,6 @@ echo "🚀 Starting AI service on port $AI_PORT..."
 python -m uvicorn services.ai.main:app --host 0.0.0.0 --port "$AI_PORT" &
 
 echo "🚀 Starting web server on port $PORT..."
-export AI_BASE_URL="http://127.0.0.1:${AI_PORT}"
+export PY_AI_BASE_URL="http://127.0.0.1:${AI_PORT}"
 cd apps/web
 node dist/src/index.js
