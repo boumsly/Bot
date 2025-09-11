@@ -13,9 +13,9 @@ pip install -r services/ai/requirements.txt
 
 echo "🔧 Installing Node.js dependencies and building web app..."
 pushd apps/web
-npm ci
+npm install
 npm run prisma:generate
-npm run prisma:migrate
+npx prisma migrate dev --schema=prisma/schema.prisma --name init
 npm run build
 popd
 
@@ -25,4 +25,4 @@ python -m uvicorn services.ai.main:app --host 0.0.0.0 --port "$AI_PORT" &
 echo "🚀 Starting web server on port $PORT..."
 export AI_BASE_URL="http://127.0.0.1:${AI_PORT}"
 cd apps/web
-node dist/index.js
+node dist/src/index.js

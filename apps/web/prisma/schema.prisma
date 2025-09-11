@@ -42,7 +42,7 @@ model Message {
   sessionId  String
   role       String
   content    String
-  meta       Json?
+  meta       String?
   createdAt  DateTime    @default(now())
 }
 
@@ -51,7 +51,7 @@ model Answer {
   session      ChatSession @relation(fields: [sessionId], references: [id])
   sessionId    String
   questionKey  String
-  value        Json
+  value        String
   createdAt    DateTime    @default(now())
   @@unique([sessionId, questionKey])
 }
