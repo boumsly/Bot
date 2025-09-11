@@ -1,0 +1,31 @@
+# Node
+node_modules/
+apps/web/node_modules/
+.apps/
+.npm/
+
+# Builds
+apps/web/dist/
+apps/web/.next/
+apps/web/out/
+
+# TypeScript
+apps/web/tsconfig.tsbuildinfo
+
+# Python
+services/ai/.venv/
+__pycache__/
+*.pyc
+
+# Env
+.env
+*.env
+infrastructure/env/*.env
+infrastructure/env/.env.*
+
+# Prisma
+apps/web/prisma/*.db
+
+# OS
+.DS_Store
+Thumbs.db

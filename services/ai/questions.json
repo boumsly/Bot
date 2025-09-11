@@ -1,0 +1,32 @@
+[
+  {
+    "key": "repetitive",
+    "questionText": "What are the tasks you repeat most often that take up a lot of your time?",
+    "type": "open",
+    "validations": { }
+  },
+  {
+    "key": "one_task",
+    "questionText": "If you could automate just one task in your work, which one would you choose?",
+    "type": "open",
+    "validations": { "min": 0 }
+  },
+  {
+    "key": "loose_time",
+    "questionText": "When do you lose the most time searching, sorting, or entering information?",
+    "type": "open",
+    "validations": { }
+  },
+  {
+    "key": "ai_tools",
+    "questionText": "What kind of AI tools do you or did you use or heard about at work?",
+    "type": "open",
+    "validations": { }
+  },
+  {
+    "key": "ai_concerns",
+    "questionText": "What concerns or conditions would you have about using AI solutions in your daily work?",
+    "type": "open",
+    "validations": { }
+  }
+]

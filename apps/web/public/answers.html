@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Reporting Réponses</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body{ margin:0; font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; background:linear-gradient(180deg,#0a0f24,#0f1530); color:#e8ecff; }
+    .wrap{ max-width: 980px; margin: 40px auto; padding: 0 16px; }
+    .card{ background: linear-gradient(180deg,#121732,#0f1530); border:1px solid #232a49; border-radius:14px; padding:20px; box-shadow: 0 10px 30px rgba(0,0,0,0.35); }
+    h1{ font-size: 22px; margin: 0 0 16px; }
+    .row{ display:flex; gap:12px; align-items:center; flex-wrap: wrap; }
+    select, input, button{ appearance:none; background:#0f152b; color:#e8ecff; border:1px solid #263056; border-radius:10px; padding:10px 12px; font-size:14px; }
+    button{ background: linear-gradient(180deg,#1a3c7c,#1b2f62); border-color:#2957a3; cursor:pointer; }
+    .pill{ display:inline-block; padding:4px 8px; border-radius:999px; border:1px solid #2b345e; background:#101737; font-size:12px; color:#b9c3ea; text-decoration:none; }
+    .log{ margin-top: 18px; padding: 12px; border-radius: 10px; background: #0d1326; border:1px dashed #263056; max-height: 420px; overflow:auto; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:12px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>Reporting Réponses</h1>
+      <div class="row">
+        <a href="/" class="pill">← Revenir au questionnaire</a>
+      </div>
+      <div class="row" style="margin-top:12px;">
+        <label>Session ID</label>
+        <input id="sid" placeholder="uuid de session" style="min-width:320px" />
+        <button id="getSession">Réponses session</button>
+      </div>
+      <div class="row" style="margin-top:12px;">
+        <label>Département</label>
+        <select id="dept">
+          <option value="hr">HR</option>
+          <option value="sales">Sales</option>
+          <option value="marketing">Marketing</option>
+        </select>
+        <button id="getDept">Réponses département</button>
+      </div>
+      <pre class="log" id="out"></pre>
+    </div>
+  </div>
+  <script>
+    const $ = (s) => document.querySelector(s);
+    const base = location.origin;
+    // Load departments from API and populate the dropdown
+    const loadDepartments = async () => {
+      const sel = document.querySelector('#dept');
+      try {
+        const r = await fetch(`${base}/api/department`);
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        const j = await r.json();
+        if (Array.isArray(j?.departments) && j.departments.length) {
+          sel.innerHTML = j.departments
+            .map((d) => `<option value="${String(d.key)}">${String(d.name || d.key)}</option>`) 
+            .join("");
+        }
+      } catch (e) {
+        console.warn('Failed to load departments, using fallback options', e);
+      }
+    };
+    $("#getSession").addEventListener("click", async () => {
+      const id = $("#sid").value.trim();
+      if (!id) { $("#out").textContent = "Veuillez saisir un sessionId"; return; }
+      const r = await fetch(`${base}/api/session/${encodeURIComponent(id)}/answers`);
+      const j = await r.json();
+      $("#out").textContent = JSON.stringify(j, null, 2);
+    });
+    $("#getDept").addEventListener("click", async () => {
+      const key = $("#dept").value;
+      const r = await fetch(`${base}/api/department/${encodeURIComponent(key)}/answers`);
+      const j = await r.json();
+      $("#out").textContent = JSON.stringify(j, null, 2);
+    });
+    document.addEventListener('DOMContentLoaded', loadDepartments);
+  </script>
+</body>
+</html>
