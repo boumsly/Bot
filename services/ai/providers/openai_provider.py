@@ -10,7 +10,7 @@ class OpenAIProvider(AIProvider):
         if not api_key:
             raise RuntimeError("OPENAI_API_KEY is not set")
         self.client = OpenAI(api_key=api_key)
-        self.model = os.getenv("OPENAI_MODEL", "gpt-5")
+        self.model = os.getenv("OPENAI_MODEL", "gpt-4")
 
     def chat(self, messages: List[Dict[str, str]], system_prompt: str | None = None) -> Dict[str, Any]:
         # Flatten messages to a single transcript string compatible with Responses API
