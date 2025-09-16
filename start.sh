@@ -18,6 +18,10 @@ fi
 if [ -f "$ENV_FILE" ]; then
     echo "📋 Loading environment from $ENV_FILE"
     export $(grep -v '^#' "$ENV_FILE" | xargs)
+    
+    # Copy the env file to apps/web/.env so dotenv can find it
+    echo "📋 Copying $ENV_FILE to apps/web/.env for Node.js"
+    cp "$ENV_FILE" "apps/web/.env"
 else
     echo "⚠️  Warning: $ENV_FILE not found, using default values"
 fi
