@@ -10,25 +10,26 @@ class OpenAIProvider(AIProvider):
         if not api_key:
             raise RuntimeError("OPENAI_API_KEY is not set")
         self.client = OpenAI(api_key=api_key)
-        self.model = os.getenv("OPENAI_MODEL", "gpt-5")
+        self.model = os.getenv("OPENAI_MODEL", "gpt-4")
 
     def chat(self, messages: List[Dict[str, str]], system_prompt: str | None = None) -> Dict[str, Any]:
-        # Flatten messages to a single transcript string compatible with Responses API
-        parts: List[str] = []
+        # Prepare messages for OpenAI Chat Completions API
+        api_messages = []
+        
         if system_prompt:
-            parts.append(f"System: {system_prompt}")
+            api_messages.append({"role": "system", "content": system_prompt})
+        
+        # Add the conversation messages
         for m in messages:
             role = m.get("role", "user")
             content = m.get("content", "")
-            if role == "system":
-                parts.append(f"System: {content}")
-            elif role == "assistant":
-                parts.append(f"Assistant: {content}")
+            if role in ["system", "user", "assistant"]:
+                api_messages.append({"role": role, "content": content})
             else:
-                parts.append(f"User: {content}")
-        transcript = "\n".join(parts)
+                # Default unknown roles to user
+                api_messages.append({"role": "user", "content": content})
 
-        # Optional temperature via env; omitted by default for maximum compatibility
+        # Optional temperature via env
         temp_env = os.getenv("OPENAI_TEMPERATURE")
         extra: Dict[str, Any] = {}
         if temp_env:
@@ -37,10 +38,10 @@ class OpenAIProvider(AIProvider):
             except Exception:
                 pass
 
-        resp = self.client.responses.create(
+        resp = self.client.chat.completions.create(
             model=self.model,
-            input=transcript,
+            messages=api_messages,
             **extra,
         )
-        content = getattr(resp, "output_text", "") or ""
+        content = resp.choices[0].message.content or ""
         return {"content": content, "model": self.model}

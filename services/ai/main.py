@@ -6,7 +6,7 @@ from fastapi.responses import JSONResponse
 import traceback
 from pydantic import BaseModel
 from typing import Optional, Any, Dict
-from providers.base import get_provider
+from .providers.base import get_provider
 
 app = FastAPI(title="AI Service")
 
