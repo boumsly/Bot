@@ -35,9 +35,25 @@ app.use(
 );
 
 // Configure Passport SAML strategy
-const samlCallbackUrl = process.env.SAML_CALLBACK_URL || "http://localhost:3000/api/auth/callback";
+// Auto-detect environment and set appropriate URLs
+const isReplit = !!process.env.REPL_SLUG;
+const isProduction = process.env.NODE_ENV === 'production' || isReplit;
+
+const defaultCallbackUrl = isReplit 
+  ? "https://bot-sightcall-polls.replit.app/api/auth/callback"
+  : "http://localhost:3000/api/auth/callback";
+
+const defaultIssuer = isReplit 
+  ? "ai-transformation-web-prod"
+  : "ai-transformation-web-dev";
+
+const samlCallbackUrl = process.env.SAML_CALLBACK_URL || defaultCallbackUrl;
 const samlEntryPoint = process.env.SAML_ENTRYPOINT || ""; // e.g. from your IdP metadata
-const samlIssuer = process.env.SAML_ISSUER || "ai-transformation-web";
+const samlIssuer = process.env.SAML_ISSUER || defaultIssuer;
+
+console.log(`🌍 Environment detected: ${isReplit ? 'Replit (Production)' : 'Local (Development)'}`);
+console.log(`🔗 SAML Callback URL: ${samlCallbackUrl}`);
+console.log(`🏷️  SAML Issuer: ${samlIssuer}`);
 const idpCertFromEnv = process.env.SAML_IDP_CERT;
 const idpCertPath = process.env.SAML_IDP_CERT_PATH?.trim().replace(/^"|"$/g, '');
 

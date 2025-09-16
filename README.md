@@ -89,6 +89,27 @@ uvicorn services.ai.main:app --reload --port 8000
   powershell -NoProfile -ExecutionPolicy Bypass -File ".\scripts\e2e.ps1" -Answer "42" -NodeKey "seniority"
   ```
 
+## Configuration SAML Multi-Environnements
+
+Le projet supporte automatiquement les environnements de développement et de production :
+
+### Développement Local
+- URL de callback : `http://localhost:3000/api/auth/callback`
+- Issuer : `ai-transformation-web-dev`
+- Port : 3000
+
+### Production Replit
+- URL de callback : `https://bot-sightcall-polls.replit.app/api/auth/callback`
+- Issuer : `ai-transformation-web-prod`
+- Port : 5000
+
+### Configuration
+1. Copiez `.env.example` vers `.env.development` ou `.env.production`
+2. Remplissez `SAML_ENTRYPOINT` avec l'URL de votre IdP
+3. Placez votre certificat IdP dans `apps/web/certs/idp_cert.pem`
+
+L'application détecte automatiquement l'environnement via `REPL_SLUG` et utilise les bonnes URLs.
+
 ## Déploiement Docker et ports
 
 - `infrastructure/docker-compose.yml`
