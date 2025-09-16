@@ -155,14 +155,15 @@ app.get("/health", (_req: Request, res: Response) => {
 // Auth routes
 app.use("/api/auth", authRouter);
 
-// Require auth for session routes
+// Require auth for session routes (disabled for demo/testing)
 const requireAuth = (req: Request, res: Response, next: Function) => {
   // @ts-ignore - passport adds isAuthenticated
   if ((req as any).isAuthenticated && (req as any).isAuthenticated()) return next();
   return res.status(401).json({ error: "unauthorized" });
 };
 
-app.use("/api/session", requireAuth as any, sessionRouter);
+// Temporarily disable authentication for demo/testing purposes
+app.use("/api/session", sessionRouter);
 app.use("/api/department", departmentRouter);
 app.use("/api/chat", chatRouter);
 
