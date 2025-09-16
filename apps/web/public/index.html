@@ -34,7 +34,14 @@
 <body>
   <div class="wrap">
     <div class="card">
-      <h1>AI Transformation</h1>
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h1>AI Transformation</h1>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span class="muted" id="userInfo"></span>
+          <button id="signin">Sign in</button>
+          <img src="https://sightcall.com/wp-content/uploads/SightCall-White-Logo-1.svg" style="height: 22px;" />
+        </div>
+      </div>
       <div class="row" style="margin-top:8px;">
         <label>Department</label>
         <select id="department">
@@ -64,6 +71,7 @@
     let typingEl = null;
     let typingShownAt = 0;
     const TYPING_MIN_MS = 800; // minimum time the typing indicator remains visible
+    let authUser = null; // filled after SSO
 
     // Load departments from API and populate the dropdown
     const loadDepartments = async () => {
@@ -137,6 +145,8 @@
     };
 
     const start = async () => {
+      // Require auth
+      if (!authUser) { push('assistant', 'Please sign in first.'); return; }
       const departmentKey = $("#department").value;
       const r = await fetch(`${base}/api/session/start`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ departmentKey }) });
       const j = await r.json();
@@ -220,6 +230,38 @@
       // Disable input and send until the first question arrives
       $("#input").disabled = true;
       $("#send").disabled = true;
+      // Disable start until authenticated
+      $("#start").disabled = true;
+      checkAuth();
+    });
+
+    // Auth helpers
+    const checkAuth = async () => {
+      try {
+        const r = await fetch(`${base}/api/auth/me`, { credentials: 'same-origin' });
+        if (r.status === 200) {
+          const j = await r.json();
+          authUser = j.user || null;
+          $("#userInfo").textContent = authUser?.email ? `Signed in: ${authUser.email}` : 'Signed in';
+          $("#signin").style.display = 'none';
+          $("#start").disabled = false;
+        } else {
+          authUser = null;
+          $("#userInfo").textContent = '';
+          $("#signin").style.display = '';
+          $("#start").disabled = true;
+        }
+      } catch {
+        authUser = null;
+        $("#userInfo").textContent = '';
+        $("#signin").style.display = '';
+        $("#start").disabled = true;
+      }
+    };
+
+    $("#signin").addEventListener('click', () => {
+      // Redirect to SAML login
+      window.location.href = `${base}/api/auth/login`;
     });
   </script>
 </body>
