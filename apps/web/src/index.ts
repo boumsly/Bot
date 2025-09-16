@@ -16,6 +16,9 @@ import authRouter from "./routes/auth";
 
 const app = express();
 
+// Trust proxy for proper forwarded headers in Replit environment
+app.set('trust proxy', 1);
+
 // Middleware to disable caching for Replit proxy environment
 app.use((req, res, next) => {
   res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
