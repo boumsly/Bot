@@ -50,5 +50,5 @@ expertMode = true
 
 [deployment]
 deploymentTarget = "vm"
-run = ["bash", "-c", "export DATABASE_URL='file:./dev.db' && export SQLITE_DATABASE_URL='file:./dev.db' && export PY_AI_BASE_URL='http://127.0.0.1:8001' && cd apps/web && npx prisma migrate deploy --schema=prisma/schema.prisma && python -m uvicorn ../../services/ai/main:app --host 127.0.0.1 --port 8001 & node dist/src/index.js"]
-build = ["bash", "-c", "pip install -r services/ai/requirements.txt && cd apps/web && npm ci && npm run prisma:generate && npm run build"]
+run = ["bash", "-c", "echo 'Starting deployment...' && export DATABASE_URL='file:./dev.db' && export SQLITE_DATABASE_URL='file:./dev.db' && export PY_AI_BASE_URL='http://127.0.0.1:8001' && cd apps/web && npx prisma migrate deploy --schema=prisma/schema.prisma && cd .. && echo 'Starting AI service...' && python -m uvicorn services.ai.main:app --host 127.0.0.1 --port 8001 & echo 'Starting web server...' && sleep 2 && cd apps/web && node dist/src/index.js"]
+build = ["bash", "-c", "echo 'Building application...' && pip install -r services/ai/requirements.txt && cd apps/web && npm ci && DATABASE_URL='file:./dev.db' SQLITE_DATABASE_URL='file:./dev.db' npm run prisma:generate && npm run build && echo 'Build complete'"]
