@@ -1,5 +1,5 @@
 run = "bash start.sh"
-modules = ["python-3.11", "nodejs-20", "postgresql-16"]
+modules = ["nodejs-20", "web", "python-3.11"]
 
 [workflows]
 runButton = "Project"
@@ -32,6 +32,7 @@ externalPort = 80
 [[ports]]
 localPort = 8001
 externalPort = 3000
+exposeLocalhost = true
 
 [[ports]]
 localPort = 34685
@@ -39,3 +40,11 @@ externalPort = 3001
 
 [nix]
 channel = "stable-25_05"
+
+[agent]
+expertMode = true
+
+[deployment]
+deploymentTarget = "vm"
+run = ["bash", "-c", "echo 'Starting production deployment...' && export NODE_ENV=production && export DATABASE_URL='file:./apps/web/prisma/dev.db' && export SQLITE_DATABASE_URL='file:./apps/web/prisma/dev.db' && export PY_AI_BASE_URL='http://127.0.0.1:8001' && export SESSION_SECRET='prod_secret_replit_2025' && echo 'Running database migration...' && cd apps/web && npx prisma migrate deploy --schema=prisma/schema.prisma && cd .. && echo 'Starting AI service on port 8001...' && python -m uvicorn services.ai.main:app --host 127.0.0.1 --port 8001 & echo 'Waiting for AI service to start...' && sleep 4 && echo 'Starting web server on $PORT...' && cd apps/web && node dist/src/index.js"]
+build = ["bash", "-c", "echo 'Building for production...' && pip install -r services/ai/requirements.txt && cd apps/web && npm ci && DATABASE_URL='file:./dev.db' SQLITE_DATABASE_URL='file:./dev.db' npm run prisma:generate && npm run build && echo 'Production build complete!'"]

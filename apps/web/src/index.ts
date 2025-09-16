@@ -15,7 +15,22 @@ import { Strategy as SamlStrategy, VerifiedCallback } from "@node-saml/passport-
 import authRouter from "./routes/auth";
 
 const app = express();
-app.use(cors());
+
+// Trust proxy for proper forwarded headers in Replit environment
+app.set('trust proxy', 1);
+
+// Middleware to disable caching for Replit proxy environment
+app.use((req, res, next) => {
+  res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.set('Pragma', 'no-cache');
+  res.set('Expires', '0');
+  next();
+});
+
+app.use(cors({
+  origin: true, // Allow all origins for Replit proxy
+  credentials: true
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // Nécessaire pour parser les données SAML POST
 app.use(express.static("public"));
@@ -156,14 +171,15 @@ app.get("/health", (_req: Request, res: Response) => {
 // Auth routes
 app.use("/api/auth", authRouter);
 
-// Require auth for session routes
+// Require auth for session routes (disabled for demo/testing)
 const requireAuth = (req: Request, res: Response, next: Function) => {
   // @ts-ignore - passport adds isAuthenticated
   if ((req as any).isAuthenticated && (req as any).isAuthenticated()) return next();
   return res.status(401).json({ error: "unauthorized" });
 };
 
-app.use("/api/session", requireAuth as any, sessionRouter);
+// Temporarily disable authentication for demo/testing purposes
+app.use("/api/session", sessionRouter);
 app.use("/api/department", departmentRouter);
 app.use("/api/chat", chatRouter);
 

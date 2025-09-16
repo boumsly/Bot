@@ -20,6 +20,8 @@ __pycache__/
 # Env
 .env
 *.env
+!.env.example
+!*/.env.example
 .venv/
 infrastructure/env/*.env
 infrastructure/env/.env.*

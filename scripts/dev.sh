@@ -7,6 +7,7 @@ set -euo pipefail
 export AI_PORT=8001
 export PORT=5000
 export DATABASE_URL="file:./dev.db"
+export SQLITE_DATABASE_URL="file:./dev.db"
 
 echo "🔧 Installing Python dependencies for AI service..."
 pip install -r services/ai/requirements.txt
@@ -20,7 +21,7 @@ npm run build
 popd
 
 echo "🚀 Starting AI service on port $AI_PORT..."
-python -m uvicorn services.ai.main:app --host 0.0.0.0 --port "$AI_PORT" &
+python -m uvicorn services.ai.main:app --host 127.0.0.1 --port "$AI_PORT" &
 
 echo "🚀 Starting web server on port $PORT..."
 export PY_AI_BASE_URL="http://127.0.0.1:${AI_PORT}"
