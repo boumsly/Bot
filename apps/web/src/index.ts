@@ -15,7 +15,19 @@ import { Strategy as SamlStrategy, VerifiedCallback } from "@node-saml/passport-
 import authRouter from "./routes/auth";
 
 const app = express();
-app.use(cors());
+
+// Middleware to disable caching for Replit proxy environment
+app.use((req, res, next) => {
+  res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.set('Pragma', 'no-cache');
+  res.set('Expires', '0');
+  next();
+});
+
+app.use(cors({
+  origin: true, // Allow all origins for Replit proxy
+  credentials: true
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // Nécessaire pour parser les données SAML POST
 app.use(express.static("public"));
