@@ -73,9 +73,35 @@ const idpCertPath = process.env.SAML_IDP_CERT_PATH?.trim().replace(/^"|"$/g, '')
 
 let idpCert;
 if (idpCertFromEnv && idpCertFromEnv.trim().length > 0) {
-  // Replace \n with actual newlines for proper PEM format
-  idpCert = idpCertFromEnv.replace(/\\n/g, '\n').trim();
-  console.log('DEBUG: Using cert from env variable, length:', idpCert.length);
+  // Fix certificate format - ensure proper PEM structure with newlines
+  let cert = idpCertFromEnv.replace(/\\n/g, '\n').trim();
+  
+  // Fix common formatting issues
+  cert = cert.replace(/-----BEGIN CERTIFICATE-----([^\n])/g, '-----BEGIN CERTIFICATE-----\n$1');
+  cert = cert.replace(/([^\n])-----END CERTIFICATE-----/g, '$1\n-----END CERTIFICATE-----');
+  
+  // Ensure each base64 line is properly separated
+  const lines = cert.split('\n');
+  const fixedLines = [];
+  
+  for (let line of lines) {
+    line = line.trim();
+    if (line === '-----BEGIN CERTIFICATE-----' || line === '-----END CERTIFICATE-----') {
+      fixedLines.push(line);
+    } else if (line.length > 0) {
+      // Split long base64 lines into 64-character chunks
+      while (line.length > 64) {
+        fixedLines.push(line.substring(0, 64));
+        line = line.substring(64);
+      }
+      if (line.length > 0) {
+        fixedLines.push(line);
+      }
+    }
+  }
+  
+  idpCert = fixedLines.join('\n');
+  console.log('DEBUG: Using cert from env variable, fixed format, length:', idpCert.length);
 } else if (idpCertPath && fs.existsSync(idpCertPath)) {
   const rawContent = fs.readFileSync(idpCertPath, "utf8");
   idpCert = rawContent.replace(/^\uFEFF/, '').trim();
