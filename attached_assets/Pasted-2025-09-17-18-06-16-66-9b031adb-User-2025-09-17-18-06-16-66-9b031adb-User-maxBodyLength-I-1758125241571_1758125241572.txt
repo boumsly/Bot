@@ -1,0 +1,136 @@
+2025-09-17 18:06:16.66
+9b031adb
+User
+},
+2025-09-17 18:06:16.66
+9b031adb
+User
+maxBodyLength: Infinity,
+2025-09-17 18:06:16.66
+9b031adb
+User
+protocol: 'http:',
+2025-09-17 18:06:16.66
+9b031adb
+User
+agents: [Object],
+2025-09-17 18:06:16.66
+9b031adb
+User
+beforeRedirect: [Function: dispatchBeforeRedirect],
+2025-09-17 18:06:16.66
+9b031adb
+User
+hostname: 'localhost',
+2025-09-17 18:06:16.66
+9b031adb
+User
+port: '8001',
+2025-09-17 18:06:16.66
+9b031adb
+User
+agent: undefined,
+2025-09-17 18:06:16.66
+9b031adb
+User
+nativeProtocols: [Object],
+2025-09-17 18:06:16.66
+9b031adb
+User
+pathname: '/next-question'
+2025-09-17 18:06:16.66
+9b031adb
+User
+_ended: false,
+2025-09-17 18:06:16.66
+9b031adb
+User
+_redirects: [],
+2025-09-17 18:06:16.66
+9b031adb
+User
+_maxListeners: undefined,
+2025-09-17 18:06:16.66
+9b031adb
+User
+outputSize: 0,
+2025-09-17 18:06:16.66
+9b031adb
+User
+destroyed: false,
+2025-09-17 18:06:16.66
+9b031adb
+User
+_last: false,
+2025-09-17 18:06:16.66
+9b031adb
+User
+chunkedEncoding: false,
+2025-09-17 18:06:16.66
+9b031adb
+User
+strictContentLength: false,
+2025-09-17 18:06:16.66
+9b031adb
+User
+socket: [Socket],
+2025-09-17 18:06:16.66
+9b031adb
+User
+_header: 'POST /next-question HTTP/1.1\r\n' +
+2025-09-17 18:06:16.66
+9b031adb
+User
+'Accept: application/json, text/plain, */*\r\n' +
+2025-09-17 18:06:16.66
+9b031adb
+User
+_keepAliveTimeout: 0,
+2025-09-17 18:06:16.66
+9b031adb
+User
+joinDuplicateHeaders: undefined,
+2025-09-17 18:06:16.66
+9b031adb
+User
+timeoutCb: [Function: emitRequestTimeout],
+2025-09-17 18:06:16.66
+9b031adb
+User
+upgradeOrConnect: false,
+2025-09-17 18:06:16.66
+9b031adb
+User
+parser: null,
+2025-09-17 18:06:16.66
+9b031adb
+User
+reusedSocket: false,
+2025-09-17 18:06:16.66
+9b031adb
+User
+_redirectable: [Circular *1],
+2025-09-17 18:06:16.66
+9b031adb
+User
+[Symbol(shapeMode)]: false,
+2025-09-17 18:06:16.66
+9b031adb
+User
+[Symbol(kUniqueHeaders)]: null
+2025-09-17 18:06:16.66
+9b031adb
+User
+_currentUrl: 'http://localhost:8001/next-question',
+2025-09-17 18:06:16.66
+9b031adb
+User
+[Symbol(shapeMode)]: true,
+2025-09-17 18:06:16.66
+9b031adb
+User
+code: 'ECONNREFUSED',
+2025-09-17 18:06:16.66
+9b031adb
+User
+}

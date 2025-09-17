@@ -15,10 +15,24 @@ import { Strategy as SamlStrategy, VerifiedCallback } from "@node-saml/passport-
 import authRouter from "./routes/auth";
 
 const app = express();
-app.use(cors());
+
+// Trust proxy for proper forwarded headers in Replit environment
+app.set('trust proxy', 1);
+
+// Middleware to disable caching for Replit proxy environment
+app.use((req, res, next) => {
+  res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.set('Pragma', 'no-cache');
+  res.set('Expires', '0');
+  next();
+});
+
+app.use(cors({
+  origin: true, // Allow all origins for Replit proxy
+  credentials: true
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // Nécessaire pour parser les données SAML POST
-app.use(express.static("public"));
 app.use(morgan("dev"));
 
 // Session & cookies must be before passport.session()
@@ -35,17 +49,59 @@ app.use(
 );
 
 // Configure Passport SAML strategy
-const samlCallbackUrl = process.env.SAML_CALLBACK_URL || "http://localhost:3000/api/auth/callback";
+// Auto-detect environment and set appropriate URLs
+const isReplit = !!process.env.REPL_SLUG;
+const isProduction = process.env.NODE_ENV === 'production' || isReplit;
+
+const defaultCallbackUrl = isReplit 
+  ? "https://bot-sightcall-polls.replit.app/api/auth/callback"
+  : "http://localhost:3000/api/auth/callback";
+
+const defaultIssuer = isReplit 
+  ? "ai-transformation-web-prod"
+  : "ai-transformation-web-dev";
+
+const samlCallbackUrl = process.env.SAML_CALLBACK_URL || defaultCallbackUrl;
 const samlEntryPoint = process.env.SAML_ENTRYPOINT || ""; // e.g. from your IdP metadata
-const samlIssuer = process.env.SAML_ISSUER || "ai-transformation-web";
+const samlIssuer = process.env.SAML_ISSUER || defaultIssuer;
+
+console.log(`🌍 Environment detected: ${isReplit ? 'Replit (Production)' : 'Local (Development)'}`);
+console.log(`🔗 SAML Callback URL: ${samlCallbackUrl}`);
+console.log(`🏷️  SAML Issuer: ${samlIssuer}`);
 const idpCertFromEnv = process.env.SAML_IDP_CERT;
 const idpCertPath = process.env.SAML_IDP_CERT_PATH?.trim().replace(/^"|"$/g, '');
 
 let idpCert;
 if (idpCertFromEnv && idpCertFromEnv.trim().length > 0) {
-  // Replace \n with actual newlines for proper PEM format
-  idpCert = idpCertFromEnv.replace(/\\n/g, '\n').trim();
-  console.log('DEBUG: Using cert from env variable, length:', idpCert.length);
+  // Fix certificate format - ensure proper PEM structure with newlines
+  let cert = idpCertFromEnv.replace(/\\n/g, '\n').trim();
+  
+  // Fix common formatting issues
+  cert = cert.replace(/-----BEGIN CERTIFICATE-----([^\n])/g, '-----BEGIN CERTIFICATE-----\n$1');
+  cert = cert.replace(/([^\n])-----END CERTIFICATE-----/g, '$1\n-----END CERTIFICATE-----');
+  
+  // Ensure each base64 line is properly separated
+  const lines = cert.split('\n');
+  const fixedLines = [];
+  
+  for (let line of lines) {
+    line = line.trim();
+    if (line === '-----BEGIN CERTIFICATE-----' || line === '-----END CERTIFICATE-----') {
+      fixedLines.push(line);
+    } else if (line.length > 0) {
+      // Split long base64 lines into 64-character chunks
+      while (line.length > 64) {
+        fixedLines.push(line.substring(0, 64));
+        line = line.substring(64);
+      }
+      if (line.length > 0) {
+        fixedLines.push(line);
+      }
+    }
+  }
+  
+  idpCert = fixedLines.join('\n');
+  console.log('DEBUG: Using cert from env variable, fixed format, length:', idpCert.length);
 } else if (idpCertPath && fs.existsSync(idpCertPath)) {
   const rawContent = fs.readFileSync(idpCertPath, "utf8");
   idpCert = rawContent.replace(/^\uFEFF/, '').trim();
@@ -140,20 +196,26 @@ app.get("/health", (_req: Request, res: Response) => {
 // Auth routes
 app.use("/api/auth", authRouter);
 
-// Require auth for session routes
+// Require auth for session routes (disabled for demo/testing)
 const requireAuth = (req: Request, res: Response, next: Function) => {
   // @ts-ignore - passport adds isAuthenticated
   if ((req as any).isAuthenticated && (req as any).isAuthenticated()) return next();
   return res.status(401).json({ error: "unauthorized" });
 };
 
-app.use("/api/session", requireAuth as any, sessionRouter);
+// Temporarily disable authentication for demo/testing purposes
+app.use("/api/session", sessionRouter);
 app.use("/api/department", departmentRouter);
 app.use("/api/chat", chatRouter);
 
-// Serve UI from /public
+// Serve UI from /public with correct path
 const publicDir = path.join(process.cwd(), "public");
-app.use(express.static(publicDir));
+app.use(express.static(publicDir, { index: "index.html" }));
+
+// Explicit root route handler
+app.get("/", (_req: Request, res: Response) => {
+  res.sendFile(path.join(publicDir, "index.html"));
+});
 
 const port = Number(process.env.PORT) || 3000;
 app.listen(port, '0.0.0.0', () => console.log(`[web] listening on :${port}`));

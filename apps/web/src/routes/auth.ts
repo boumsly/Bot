@@ -61,8 +61,17 @@ router.get("/metadata", (req: Request, res: Response) => {
     res.type("application/xml").send(metadata);
   } else {
     // Fallback minimal metadata so the IdP can be configured before SAML is enabled
-    const entityId = process.env.SAML_ISSUER || "http://localhost:3000/api/auth/metadata";
-    const acsUrl = process.env.SAML_CALLBACK_URL || "http://localhost:3000/api/auth/callback";
+    // Auto-detect environment for metadata URLs
+    const isReplit = !!process.env.REPL_SLUG;
+    const defaultEntityId = isReplit 
+      ? "https://bot-sightcall-polls.replit.app/api/auth/metadata"
+      : "http://localhost:3000/api/auth/metadata";
+    const defaultAcsUrl = isReplit 
+      ? "https://bot-sightcall-polls.replit.app/api/auth/callback"
+      : "http://localhost:3000/api/auth/callback";
+      
+    const entityId = process.env.SAML_ISSUER || defaultEntityId;
+    const acsUrl = process.env.SAML_CALLBACK_URL || defaultAcsUrl;
     // Optional SP cert if present
     const certPath = path.join(process.cwd(), "certs", "cert.pem");
     let x509 = "";
