@@ -28,7 +28,7 @@ fi
 
 # Set default ports if not already set
 export AI_PORT=${AI_PORT:-8001}
-export PORT=${PORT:-5000}
+export PORT=${PORT:-3000}
 export DATABASE_URL=${DATABASE_URL:-"file:./dev.db"}
 
 echo "🔧 Installing Python dependencies for AI service..."
