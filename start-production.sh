@@ -21,15 +21,17 @@ if [ -f ".env.production" ]; then
     cp .env.production apps/web/.env
 fi
 
+# Install Python dependencies
+echo "🔧 Installing Python dependencies for AI service..."
+pip install -r services/ai/requirements.txt
+
 # Start AI service in background
 echo "🤖 Starting AI service on port $AI_PORT..."
-cd services/ai
-python -m uvicorn main:app --host 0.0.0.0 --port "$AI_PORT" &
+python -m uvicorn services.ai.main:app --host 0.0.0.0 --port "$AI_PORT" &
 AI_PID=$!
 echo "🤖 AI service started with PID: $AI_PID"
-echo "⏳ Waiting 5 seconds for AI service to be ready..."
-sleep 5
-cd ../..
+echo "⏳ Waiting 8 seconds for AI service to be ready..."
+sleep 8
 
 # Setup database
 echo "🗄️ Setting up production database..."
@@ -48,5 +50,5 @@ npm run seed
 
 # Start web server
 echo "🌐 Starting web server on port $PORT..."
-export PY_AI_BASE_URL="http://localhost:${AI_PORT}"
+export PY_AI_BASE_URL="http://127.0.0.1:${AI_PORT}"
 node dist/src/index.js
