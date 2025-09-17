@@ -25,6 +25,10 @@ fi
 echo "🤖 Starting AI service on port $AI_PORT..."
 cd services/ai
 python -m uvicorn main:app --host 0.0.0.0 --port "$AI_PORT" &
+AI_PID=$!
+echo "🤖 AI service started with PID: $AI_PID"
+echo "⏳ Waiting 5 seconds for AI service to be ready..."
+sleep 5
 cd ../..
 
 # Setup database
@@ -44,5 +48,5 @@ npm run seed
 
 # Start web server
 echo "🌐 Starting web server on port $PORT..."
-export PY_AI_BASE_URL="http://127.0.0.1:${AI_PORT}"
+export PY_AI_BASE_URL="http://localhost:${AI_PORT}"
 node dist/src/index.js
