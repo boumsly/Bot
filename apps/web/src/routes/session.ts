@@ -5,7 +5,7 @@ import type { Request, Response } from "express";
 
 const prisma = new PrismaClient();
 const router = Router();
-const AI_BASE = process.env.PY_AI_BASE_URL || "http://localhost:8000";
+const AI_BASE = process.env.PY_AI_BASE_URL || "http://127.0.0.1:8001";
 
 router.post("/start", async (req: Request, res: Response) => {
   try {
