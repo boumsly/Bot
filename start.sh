@@ -37,9 +37,12 @@ pip install -r services/ai/requirements.txt
 echo "🔧 Installing Node.js dependencies and building web app..."
 pushd apps/web
 npm install
+# Install TypeScript explicitly to avoid conflicts
+npm install typescript --save-dev
 npm run prisma:generate
 npx prisma migrate dev --schema=prisma/schema.prisma --name init
-npm run build
+# Use direct npx call instead of npm run build
+npx typescript/bin/tsc -p .
 popd
 
 echo "🚀 Starting AI service on port $AI_PORT..."
