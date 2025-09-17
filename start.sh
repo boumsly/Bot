@@ -42,7 +42,8 @@ npm install typescript --save-dev
 npm run prisma:generate
 npx prisma migrate dev --schema=prisma/schema.prisma --name init
 # Use direct npx call instead of npm run build
-npx typescript/bin/tsc -p .
+# Use direct npx call instead of npm run build
+./node_modules/.bin/tsc -p .
 popd
 
 echo "🚀 Starting AI service on port $AI_PORT..."
