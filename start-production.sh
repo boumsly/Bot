@@ -27,8 +27,22 @@ cd services/ai
 python -m uvicorn main:app --host 0.0.0.0 --port "$AI_PORT" &
 cd ../..
 
+# Setup database
+echo "🗄️ Setting up production database..."
+cd apps/web
+
+# Set SQLite database URL for production
+export SQLITE_DATABASE_URL="file:./prisma/dev.db"
+
+# Run migrations to ensure database structure is up to date
+echo "📊 Running database migrations..."
+npx prisma migrate deploy --schema=prisma/schema.prisma
+
+# Run seed to populate departments
+echo "🌱 Seeding database with departments..."
+npm run seed
+
 # Start web server
 echo "🌐 Starting web server on port $PORT..."
 export PY_AI_BASE_URL="http://127.0.0.1:${AI_PORT}"
-cd apps/web
 node dist/src/index.js
