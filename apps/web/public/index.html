@@ -160,22 +160,35 @@
             />
           </div>
         </div>
-        <div class="row" style="margin-top: 8px">
-          <label>Department</label>
-          <select id="department">
-            <option value="hr">HR</option>
-            <option value="sales">Sales</option>
-            <option value="marketing">Marketing</option>
-          </select>
-          <button id="start">Start</button>
-          <span class="muted" id="sidInfo"></span>
+        <!-- Authentication required sections - hidden by default -->
+        <div id="authRequiredSections" style="display: none;">
+          <div class="row" style="margin-top: 8px">
+            <label>Department</label>
+            <select id="department">
+              <option value="hr">HR</option>
+              <option value="sales">Sales</option>
+              <option value="marketing">Marketing</option>
+            </select>
+            <button id="start">Start</button>
+            <span class="muted" id="sidInfo"></span>
+          </div>
+          <div class="chat" id="chat"></div>
+          <div class="row" style="margin-top: 10px">
+            <input id="input" placeholder="Your message..." />
+            <button id="send">Send</button>
+          </div>
+          <div class="muted" id="hint"></div>
         </div>
-        <div class="chat" id="chat"></div>
-        <div class="row" style="margin-top: 10px">
-          <input id="input" placeholder="Your message..." />
-          <button id="send">Send</button>
+        
+        <!-- Welcome message when not authenticated -->
+        <div id="welcomeMessage" style="margin-top: 16px; text-align: center;">
+          <div class="muted" style="font-size: 16px; margin-bottom: 10px;">
+            🔐 Please sign in to access the AI Transformation chatbot
+          </div>
+          <div class="muted" style="font-size: 14px;">
+            Use your company credentials to start a conversation about AI opportunities in your department.
+          </div>
         </div>
-        <div class="muted" id="hint"></div>
       </div>
     </div>
     <script>
@@ -420,17 +433,26 @@
               : "Signed in";
             $("#signin").style.display = "none";
             $("#start").disabled = false;
+            // Show authenticated sections and hide welcome message
+            $("#authRequiredSections").style.display = "block";
+            $("#welcomeMessage").style.display = "none";
           } else {
             authUser = null;
             $("#userInfo").textContent = "";
             $("#signin").style.display = "";
             $("#start").disabled = true;
+            // Hide authenticated sections and show welcome message
+            $("#authRequiredSections").style.display = "none";
+            $("#welcomeMessage").style.display = "block";
           }
         } catch {
           authUser = null;
           $("#userInfo").textContent = "";
           $("#signin").style.display = "";
           $("#start").disabled = true;
+          // Hide authenticated sections and show welcome message
+          $("#authRequiredSections").style.display = "none";
+          $("#welcomeMessage").style.display = "block";
         }
       };
 
